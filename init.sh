@@ -2,8 +2,10 @@
 
 # Updating ccurl submodule
 git submodule update --init --recursive
-rm -f src/libccurl.so
-rm -f src/helpers.dll
+# Delete binaries if present
+rm -f pow/libccurl.so
+rm -f pow/helpers.dll
+# Get current working directory
 WD=$(pwd)
 
 # Bulding using cmake
@@ -16,9 +18,9 @@ echo "The built library is at:"
 echo $LIB
 
 echo "Copying shared library file to the src directory..."
-cp $LIB pow/
+cp $LIB $WD/pow
 
-echo "Done."
+echo "Done building CCurl binaries..."
 
 # Bulding using bazel
 echo "Building entangled/common/helpers library with bazel..."
@@ -29,4 +31,4 @@ LIB="bazel-bin/common/helpers/helpers.dll"
 echo "Copying shared library file to the src directory..."
 cp $LIB $WD/pow
 
-echo "Done."
+echo "Done building entangled/common/helpers binaries..."
