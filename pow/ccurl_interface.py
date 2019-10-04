@@ -17,11 +17,14 @@ def get_hash_trytes(trytes):
     return _libccurl.ccurl_digest_transaction(c_char_p(trytes.encode('utf-8')))
 
 # Takes a bundle object, calculates the pow, attaches tx hash
-def local_attach_to_tangle(bundle,
+def local_attach_to_tangle(bundle_trytes, # Iterable[txtrytes]
                         trunk_transaction_hash,
                         branch_transaction_hash,
                         mwm):
     previoustx = None
+
+    # Construct bundle object
+    bundle = iota.Bundle.from_tryte_strings(bundle_trytes)
 
     for txn in reversed(bundle._transactions):
         txn.attachment_timestamp = int(round(time.time() * 1000))
