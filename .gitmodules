@@ -1,0 +1,6 @@
+[submodule "ccurl"]
+	path = ccurl
+	url = https://github.com/iotaledger/ccurl.git
+[submodule "entangled"]
+	path = entangled
+	url = https://github.com/iotaledger/entangled.git
