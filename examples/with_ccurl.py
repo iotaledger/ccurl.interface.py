@@ -44,7 +44,7 @@ gta = api.get_transactions_to_approve(depth=3) # get tips to be approved by your
 
 mwm = 14 # target is mainnet
 
-bundle = ccurl_interface.local_attach_to_tangle(pb, gta['trunkTransaction'], gta['branchTransaction'], mwm)
+bundle = ccurl_interface.attach_to_tangle(pb, gta['trunkTransaction'], gta['branchTransaction'], mwm)
 
 bundle_trytes = [ x.as_tryte_string() for x in pb._transactions ]
 
@@ -52,5 +52,6 @@ bundle_trytes = [ x.as_tryte_string() for x in pb._transactions ]
 broadcasted = api.broadcast_and_store(bundle_trytes)
 
 bundle_broadcasted =iota.Bundle.from_tryte_strings(broadcasted['trytes'])
+
 pprint('Local pow broadcasted transactions are:')
 pprint(bundle_broadcasted.as_json_compatible())

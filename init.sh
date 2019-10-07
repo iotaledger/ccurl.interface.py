@@ -4,7 +4,7 @@
 git submodule update --init --recursive
 # Delete binaries if present
 rm -f pow/libccurl.so
-rm -f pow/helpers.dll
+#rm -f pow/helpers.dll
 # Get current working directory
 WD=$(pwd)
 
@@ -21,14 +21,3 @@ echo "Copying shared library file to the src directory..."
 cp $LIB $WD/pow
 
 echo "Done building CCurl binaries..."
-
-# Bulding using bazel
-echo "Building entangled/common/helpers library with bazel..."
-cd entangled
-bazel build //common/helpers:helpers.dll
-
-LIB="bazel-bin/common/helpers/helpers.dll"
-echo "Copying shared library file to the src directory..."
-cp $LIB $WD/pow
-
-echo "Done building entangled/common/helpers binaries..."

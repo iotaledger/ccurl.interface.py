@@ -18,14 +18,17 @@ def get_hash(trytes):
     return _libpow.iota_digest(c_char_p(trytes.encode('utf-8')))
 
 # Takes a bundle object, calculates the pow, attaches tx hash
-def local_attach_to_tangle(bundle,
-                        trunk_transaction_hash,
+def attach_to_tangle(bundle_trytes,
                         branch_transaction_hash,
+                        trunk_transaction_hash,
                         mwm):
     previoustx = None
 
+    # Construct bundle object
+    bundle = iota.Bundle.from_tryte_strings(bundle_trytes)
+
     # Iterate thorugh transactions in the bundle, starting from the tail
-    for txn in reversed(bundle._transactions):
+    for txn in reversed(bundle.transactions):
         # Fill out attachment timestamp, field is used to calculate nonce
         txn.attachment_timestamp = int(round(time.time() * 1000))
         txn.attachment_timestamp_upper_bound = (math.pow(3,27) - 1) // 2
@@ -62,5 +65,5 @@ def local_attach_to_tangle(bundle,
 
         previoustx = txn.hash
         # put that back in the bundle
-        bundle._transactions[txn.current_index] = txn
-    return bundle
+        bundle.transactions[txn.current_index] = txn
+    return bundle.as_tryte_strings()
