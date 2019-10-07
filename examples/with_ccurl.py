@@ -52,5 +52,6 @@ bundle_trytes = [ x.as_tryte_string() for x in pb._transactions ]
 broadcasted = api.broadcast_and_store(bundle_trytes)
 
 bundle_broadcasted =iota.Bundle.from_tryte_strings(broadcasted['trytes'])
+
 pprint('Local pow broadcasted transactions are:')
 pprint(bundle_broadcasted.as_json_compatible())
