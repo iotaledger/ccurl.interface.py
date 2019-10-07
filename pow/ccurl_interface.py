@@ -17,7 +17,7 @@ def get_hash_trytes(trytes):
     return _libccurl.ccurl_digest_transaction(c_char_p(trytes.encode('utf-8')))
 
 # Takes a bundle object, calculates the pow, attaches tx hash
-def local_attach_to_tangle(bundle_trytes, # Iterable[txtrytes]
+def attach_to_tangle(bundle_trytes, # Iterable[txtrytes]
                         trunk_transaction_hash,
                         branch_transaction_hash,
                         mwm):

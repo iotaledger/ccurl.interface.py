@@ -18,7 +18,7 @@ def get_hash(trytes):
     return _libpow.iota_digest(c_char_p(trytes.encode('utf-8')))
 
 # Takes a bundle object, calculates the pow, attaches tx hash
-def local_attach_to_tangle(bundle_trytes,
+def attach_to_tangle(bundle_trytes,
                         branch_transaction_hash,
                         trunk_transaction_hash,
                         mwm):
