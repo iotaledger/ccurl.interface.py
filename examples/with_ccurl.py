@@ -44,9 +44,13 @@ gta = api.get_transactions_to_approve(depth=3) # get tips to be approved by your
 
 mwm = 14 # target is mainnet
 
-bundle = ccurl_interface.attach_to_tangle(pb, gta['trunkTransaction'], gta['branchTransaction'], mwm)
-
-bundle_trytes = [ x.as_tryte_string() for x in pb._transactions ]
+bundle_trytes =\
+    ccurl_interface.attach_to_tangle(
+        pb.as_tryte_strings(),
+        gta['trunkTransaction'],
+        gta['branchTransaction'],
+        mwm
+    )
 
 # Broadcast transactions on the Tangle
 broadcasted = api.broadcast_and_store(bundle_trytes)
