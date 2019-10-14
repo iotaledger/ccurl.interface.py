@@ -7,7 +7,7 @@ setup(
   name        = 'PyOTA-PoW',
   description = 'Ccurl PoW Interface for PyOTA',
   url         = 'https://github.com/lzpap/ccurl.interface.py',
-  version     = '1.0.0',
+  version     = '1.0.1',
 
   long_description = long_description,
   packages=['pow'],
