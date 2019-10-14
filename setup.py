@@ -5,7 +5,7 @@ with open('README.rst', 'r') as f: # type: StreamReader
 
 setup(
   name        = 'PyOTA-PoW',
-  description = 'Local PoW Ccurl interface for PyOTA',
+  description = 'Ccurl PoW Interface for PyOTA',
   url         = 'https://github.com/lzpap/ccurl.interface.py',
   version     = '1.0.0',
 
@@ -27,6 +27,8 @@ setup(
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Topic :: Software Development :: Libraries :: Python Modules',
   ],
