@@ -26,10 +26,11 @@ pt2 = iota.ProposedTransaction(address = iota.Address(addys[1]), # 81 trytes lon
                                message = iota.TryteString.from_unicode('Hey hey, trying to figure this thing out. This is tx2, now is %s' % (NowIs)),
                                tag     = iota.Tag(b'LOCALATTACHINTERFACE99999'), # Up to 27 trytes
                                value   = 0)
+
 # besides the given attributes, library also adds a transaction timestamp
 
 # preparing bundle that consists of both transactions prepared in the previous example
-pb = iota.ProposedBundle(transactions=[pt2,pt]) # list of prepared transactions is needed at least
+pb = iota.ProposedBundle(transactions=[pt,pt2]) # list of prepared transactions is needed at least
 
 # generate bundle hash using sponge/absorb function + normalize bundle hash + copy bundle hash into each transaction / bundle is finalized
 pb.finalize()
@@ -44,9 +45,13 @@ gta = api.get_transactions_to_approve(depth=3) # get tips to be approved by your
 
 mwm = 14 # target is mainnet
 
-bundle = ccurl_interface.attach_to_tangle(pb, gta['trunkTransaction'], gta['branchTransaction'], mwm)
-
-bundle_trytes = [ x.as_tryte_string() for x in pb._transactions ]
+bundle_trytes =\
+    ccurl_interface.attach_to_tangle(
+        pb.as_tryte_strings(),
+        gta['trunkTransaction'],
+        gta['branchTransaction'],
+        mwm
+    )
 
 # Broadcast transactions on the Tangle
 broadcasted = api.broadcast_and_store(bundle_trytes)
