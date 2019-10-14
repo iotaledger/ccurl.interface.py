@@ -138,7 +138,7 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
         # Create powed txn object
         powed_txn = iota.Transaction.from_tryte_string(
             trytes=powed_txn_trytes,
-            hash=hash_
+            hash_=hash_
         )
 
         previoustx = powed_txn.hash
