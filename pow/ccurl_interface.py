@@ -107,6 +107,8 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
     # Construct bundle object
     bundle = iota.Bundle.from_tryte_strings(bundle_trytes)
 
+    # reversed, beause pyota bundles look like [...tx2,tx1,tx0]
+    # and we need the tail tx first (tx0)
     for txn in reversed(bundle.transactions):
         txn.attachment_timestamp = get_current_ms()
         txn.attachment_timestamp_upper_bound = (math.pow(3,27) - 1) // 2
@@ -116,7 +118,7 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
                 txn.branch_transaction_hash = branch_transaction_hash
                 txn.trunk_transaction_hash = trunk_transaction_hash
             else:
-                raise ValueError('Tail transaction is incosistent in bundle')
+                raise ValueError('Tail transaction is inconsistent in bundle')
 
         else: # It is not a tail transaction
             txn.branch_transaction_hash = trunk_transaction_hash
@@ -128,13 +130,16 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
         powed_txn_string = get_powed_tx_trytes(txn_string, mwm)
         # construct trytestring from python string
         powed_txn_trytes = iota.TryteString(powed_txn_string)
-        # Create powed txn object
-        powed_txn = iota.Transaction.from_tryte_string(powed_txn_trytes)
-
+        # compute transaction hash
         hash_string = get_hash_trytes(powed_txn_string)
         hash_trytes = iota.TryteString(hash_string)
-        powed_txn.hash = iota.TransactionHash(hash_trytes)
-        powed_txn.hash_ = iota.TransactionHash(hash_trytes)
+        hash_= iota.TransactionHash(hash_trytes)
+
+        # Create powed txn object
+        powed_txn = iota.Transaction.from_tryte_string(
+            trytes=powed_txn_trytes,
+            hash=hash_
+        )
 
         previoustx = powed_txn.hash
         # put that back in the bundle
