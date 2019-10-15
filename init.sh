@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Updating ccurl submodule
 git submodule update --init --recursive
 # Delete binaries if present
 rm -f pow/libccurl.so
-#rm -f pow/helpers.dll
+
 # Get current working directory
 WD=$(pwd)
 
