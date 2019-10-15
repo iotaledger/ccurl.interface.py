@@ -23,7 +23,7 @@ Installation
 
 To use the module, follow the steps: - Clone the repo from GitHub:
 
-``$ git clone https://github.com/lzpap/ccurl.interface.py.git``
+``$ git clone https://github.com/iotaledger/ccurl.interface.py.git``
 
 -  Make sure you have `cmake <https://cmake.org/>`__ availabke on your
    system. This is a build dependecy for the ccurl library.
@@ -55,17 +55,17 @@ Code Example
 ::
 
     import iota
-    from pprint import *
+    from pprint import pprint
     from pow import ccurl_interface
 
     # Generate seed
     myseed = iota.crypto.types.Seed.random()
 
-    #Generate two addresses
+    # Generate two addresses
     addres_generator = iota.crypto.addresses.AddressGenerator(myseed)
     addys = addres_generator.get_addresses(1, count=2)
 
-    # preparing transactions
+    # Preparing transactions
     pt = iota.ProposedTransaction(address = iota.Address(addys[0]),
                                   tag     = iota.Tag(b'LOCALATTACHINTERFACE99999'),
                                   value   = 0)
@@ -74,16 +74,16 @@ Code Example
                                    tag     = iota.Tag(b'LOCALATTACHINTERFACE99999'),
                                    value   = 0)
 
-    # preparing bundle that consists of both transactions prepared in the previous example
+    # Preparing bundle that consists of both transactions prepared in the previous example
     pb = iota.ProposedBundle(transactions=[pt2,pt])
 
-    # generate bundle hash
+    # Generate bundle hash
     pb.finalize()
 
-    # declare a api instance
-    api = iota.Iota("https://nodes.thetangle.org:443") # selecting IOTA node
+    # Declare an api instance
+    api = iota.Iota("https://nodes.thetangle.org:443")
 
-    # get tips to be approved by your bundle
+    # Get tips to be approved by your bundle
     gta = api.get_transactions_to_approve(depth=3)
 
     minimum_weight_magnitude = 14 # target is mainnet
@@ -96,7 +96,7 @@ Code Example
             gta['branchTransaction'],
             mwm
         )
-    
+
     # Broadcast transactions on the Tangle
     broadcasted = api.broadcast_and_store(bundle_trytes)
 
@@ -115,4 +115,4 @@ Contribute
 ----------
 
 Raise issues:
-https://github.com/lzpap/ccurl.interface.py/issues
+https://github.com/iotaledger/ccurl.interface.py/issues
