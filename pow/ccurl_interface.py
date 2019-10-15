@@ -1,8 +1,11 @@
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 from ctypes import *
-import iota
+from iota import TransactionTrytes, Bundle, TryteString, TransactionHash, Transaction
+from iota.exceptions import with_context
 import math
 import time
-from iota.exceptions import with_context
 
 from pkg_resources import resource_filename
 libccurl_path = resource_filename("pow","libccurl.so")
@@ -24,10 +27,10 @@ def check_tx_trytes_length(trytes):
     """
     Checks if trytes are exactly one transaction in length.
     """
-    if len(trytes) != iota.TransactionTrytes.LEN:
+    if len(trytes) != TransactionTrytes.LEN:
         raise with_context(
             exc=ValueError('Trytes must be {len} trytes long.'.format(
-                len= iota.TransactionTrytes.LEN
+                len= TransactionTrytes.LEN
             )),
 
             context={
@@ -105,7 +108,7 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
     previoustx = None
 
     # Construct bundle object
-    bundle = iota.Bundle.from_tryte_strings(bundle_trytes)
+    bundle = Bundle.from_tryte_strings(bundle_trytes)
 
     # reversed, beause pyota bundles look like [...tx2,tx1,tx0]
     # and we need the tail tx first (tx0)
@@ -129,14 +132,14 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
         # returns a python unicode string
         powed_txn_string = get_powed_tx_trytes(txn_string, mwm)
         # construct trytestring from python string
-        powed_txn_trytes = iota.TryteString(powed_txn_string)
+        powed_txn_trytes = TryteString(powed_txn_string)
         # compute transaction hash
         hash_string = get_hash_trytes(powed_txn_string)
-        hash_trytes = iota.TryteString(hash_string)
-        hash_= iota.TransactionHash(hash_trytes)
+        hash_trytes = TryteString(hash_string)
+        hash_= TransactionHash(hash_trytes)
 
         # Create powed txn object
-        powed_txn = iota.Transaction.from_tryte_string(
+        powed_txn = Transaction.from_tryte_string(
             trytes=powed_txn_trytes,
             hash_=hash_
         )

@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function, \
 
 from unittest import TestCase
 from pow import ccurl_interface
-import iota
 
 class CcurlPowTestcase(TestCase):
     """
