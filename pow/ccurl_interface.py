@@ -2,10 +2,11 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
 from ctypes import *
-from iota import TransactionTrytes, Bundle, TryteString, TransactionHash, Transaction
-from iota.exceptions import with_context
+from iota import Bundle, TransactionTrytes, TransactionHash, TryteString, \
+    Transaction
 import math
 import time
+from iota.exceptions import with_context
 
 from pkg_resources import resource_filename
 libccurl_path = resource_filename("pow","libccurl.so")
