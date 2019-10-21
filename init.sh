@@ -1,18 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# ccurl submodule can't be at root level, because then naming collides with
+# pyota-ccurl's naming in iota.py repo.
+# In iota.crypto.__init__, `from ccurl import ...` tries to import
+# from this `ccurl` rather then from `pyota-ccurl`, that results in ImportError.
 
 # Updating ccurl submodule
 git submodule update --init --recursive
 # Delete binaries if present
 rm -f pow/libccurl.so
-#rm -f pow/helpers.dll
+
 # Get current working directory
 WD=$(pwd)
 
 # Bulding using cmake
 echo "Building ccurl library with cmake..."
-cd ccurl && mkdir -p build && cd build && cmake .. && cmake --build .
-cd ../..
-LIB=$(find . -name "*.so")
+cd ccurl_repo/ccurl && mkdir -p build && cd build && cmake .. && cmake --build .
+cd ../../..
+LIB=$(find ./ccurl_repo -name "*.so")
 
 echo "The built library is at:"
 echo $LIB

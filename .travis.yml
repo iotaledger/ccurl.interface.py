@@ -1,0 +1,23 @@
+language: python
+python:
+- '2.7'
+- '3.5'
+- '3.6'
+- '3.7'
+before_install: "./init.sh"
+install:
+- pip install .
+script:
+- nosetests
+deploy:
+  on:
+    python: '3.7'
+    tags: true
+  provider: pypi
+  distributions: bdist_wheel sdist
+  skip_cleanup: true
+  skip_upload_docs: true
+  skip_existing: true
+  user: __token__
+  password:
+    secure: ppsDd45z2dXEm+fRP8gTSldI+re64/Q+Q8iRXxKUB22mcbkVUEaqNpYrjd7juQIL1T/LncMunSE8vqd+rEEHcVbLR5nCOyjjPaeXdeQaqWlGCUII3TH6o1V7WhnKG4JM9CocOJNLP3COKmxacfH6e+O8iw1dgrDxXx27Erff82xYlTLBBFsEPYk4njvk0ghe5FztOpMT/im2gNglB27PSFawIEbE7DWVxjD7Bv+dSoGKvgxFnTyfVaIQD2y2NAc0PazLSNRFa6tRmMmKePkzxkN3u7Zupao/SHCZRzCA0d9VlcMmFhFzS28V7pfKz/bj5Xz+9u8WnS3TotJGaEFHKj1pnAoRqw0wVdFlsryCt2FT/ZJfYMrTDViGh8x/ZfVUrLbwQjUHcAhsa2JGDThSTqGc3Arz67hkcQa1Asqtm9Pt+GbhskmbTinFRPt0aS//Ncd6jiMcfw3uzN3d0x60ftwPH26Zd8PjVtTnTv6RVJcVKSh5GrUhBDKUsjguEL0124eMLixfSqwMYG8PfhO3PYpHv5wqSvEL+tuexLxavvy1m927XWhufAFbcuezLb7ePLmJrzvL2NpbuO1KU8CIO/6U2DzptEB/TGbL5N5kY/1CLUvls1GSoF435tg13qG1N+nDoocI/rXVlbg9hDcQUV+WrIyhj6aCleWwIt8lyxU=
