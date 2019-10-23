@@ -25,7 +25,7 @@ To use the module, follow the steps: - Clone the repo from GitHub:
 
 ``$ git clone https://github.com/iotaledger/ccurl.interface.py.git``
 
--  Make sure you have `cmake <https://cmake.org/>`__ availabke on your
+-  Make sure you have `cmake <https://cmake.org/>`__ available on your
    system. This is a build dependecy for the ccurl library.
 -  Build ccurl according to `build
    instructions <https://github.com/iotaledger/ccurl/blob/master/README.md>`__
