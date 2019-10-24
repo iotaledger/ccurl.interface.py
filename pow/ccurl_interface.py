@@ -110,6 +110,8 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
 
     # Construct bundle object
     bundle = Bundle.from_tryte_strings(bundle_trytes)
+    # Used for checking transaction hash
+    trailing_zeros = [0] * mwm
 
     # reversed, beause pyota bundles look like [...tx2,tx1,tx0]
     # and we need the tail tx first (tx0)
@@ -137,6 +139,13 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
         # compute transaction hash
         hash_string = get_hash_trytes(powed_txn_string)
         hash_trytes = TryteString(hash_string)
+
+        # Check transaction hash
+        hash_trits = hash_trytes.as_trits()
+        # Last `mwm` trits should be zero
+        if hash_trits[-mwm:] != trailing_zeros:
+            raise ValueError('Inconsistent transaction hash returned.')
+
         hash_= TransactionHash(hash_trytes)
 
         # Create powed txn object
