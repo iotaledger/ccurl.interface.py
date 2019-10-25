@@ -260,12 +260,13 @@ class CcurlPowTestcase(TestCase):
 
     def test_wrong_index(self):
         """
-        Tail transaction has wrong index.
+        Head transaction has wrong index.
         """
         # Careful not to modify the original object, as it is defined in
         # setUpClass(), so reused across all test methods.
         bundle = copy.deepcopy(self.bundle)
-        bundle.tail_transaction.current_index = 5
+        # Assign wrong index to head transaction
+        bundle.transactions[len(bundle.transactions)-1].current_index  = 5
 
         self.assertRaises(
             ValueError,
@@ -278,29 +279,26 @@ class CcurlPowTestcase(TestCase):
 
     def test_wrong_hash(self):
         """
-        Wrong hash is returned by ccurl lib.
+        Transaction hash is incorrect.
         """
-        # Must be 81 trytes long to avoid padding
-        # that would fill the end with zeros
-        self.hash_ = TransactionHash(
-            'TEST9TRANSACTIONHASH9DONTUSEINPRODUCTION'
-            'TEST9TRANSACTIONHASH9DONTUSEINPRODUCTION'
-            'A'
-        )
-        with patch('pow.ccurl_interface.get_hash_trytes',
-                    MagicMock(return_value=self.hash_)):
-            # There is no point in doing pow here
-            with patch('pow.ccurl_interface.get_powed_tx_trytes',
-                        MagicMock(return_value='')):
-                self.assertRaises(
-                    ValueError,
-                    ccurl_interface.attach_to_tangle,
-                    # Enough if we have one tx in bundle
-                    self.single_tx_bundle.as_tryte_strings(),
-                    self.branch,
-                    self.trunk,
-                    mwm=14
-                )
+        # What is happening here:
+        # single_tx_bundle is a finalized but not attached bundle.
+        # We mock away the actual pow calculation, return the "unpowed" trytes,
+        # that will of course hash to an incorrect transaction hash.
+        # This should be picked up by ccurl_interface.
+        with patch('pow.ccurl_interface.get_powed_tx_trytes',
+                    MagicMock(return_value=
+                        self.single_tx_bundle.as_tryte_strings()[0].__str__()
+                    )):
+            self.assertRaises(
+                ValueError,
+                ccurl_interface.attach_to_tangle,
+                # Enough if we have one tx in bundle
+                self.single_tx_bundle.as_tryte_strings(),
+                self.branch,
+                self.trunk,
+                mwm=14
+            )
 
     def test_timestamps(self):
         """

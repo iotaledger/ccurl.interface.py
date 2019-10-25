@@ -66,7 +66,7 @@ def get_powed_tx_trytes( trytes, mwm ):
 def get_hash_trytes(trytes):
     """
     Calls `ccurl_digest_transaction` function from ccurl
-    library to calculate `rtansaction hash`. Returns the
+    library to calculate `transaction hash`. Returns the
     81 trytes long hash in unicode string format.
     """
     # Make sure we supply the right size of tx trytes to ccurl
@@ -110,51 +110,79 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
 
     # Construct bundle object
     bundle = Bundle.from_tryte_strings(bundle_trytes)
-    # Used for checking transaction hash
+
+    # Used for checking hash
     trailing_zeros = [0] * mwm
 
-    # reversed, beause pyota bundles look like [...tx2,tx1,tx0]
-    # and we need the tail tx first (tx0)
+    # reversed, beause pyota bundles look like [tx0,tx1,...]
+    # and we need the head (last) tx first
     for txn in reversed(bundle.transactions):
-        txn.attachment_timestamp = get_current_ms()
-        txn.attachment_timestamp_upper_bound = (math.pow(3,27) - 1) // 2
-        
-        if (not previoustx): # this is the tail transaction
-            if txn.current_index == txn.last_index:
-                txn.branch_transaction_hash = branch_transaction_hash
-                txn.trunk_transaction_hash = trunk_transaction_hash
+        # Ccurl lib sometimes needs a kick to return the correct powed trytes.
+        # We can check the correctness by examining trailing zeros of the
+        # transaction hash. If that fails, we try calculating the pow again.
+        # Use `max_iter` to prevent infinite loop. Calculation error appears
+        # rarely, and usually the second try yields correct result. If we reach
+        # `max_iter`, we raise a ValueError.
+        max_iter = 5
+        i = 0
+
+        # If calculation is successful, we break out from the while loop.
+        while i != max_iter:
+            # Fill timestamps
+            txn.attachment_timestamp = get_current_ms()
+            txn.attachment_timestamp_upper_bound = (math.pow(3,27) - 1) // 2
+
+            # Determine correct trunk and branch transaction
+            if (not previoustx): # this is the head transaction
+                if txn.current_index == txn.last_index:
+                    txn.branch_transaction_hash = branch_transaction_hash
+                    txn.trunk_transaction_hash = trunk_transaction_hash
+                else:
+                    raise ValueError('Head transaction is inconsistent in bundle')
+
+            else: # It is not the head transaction
+                txn.branch_transaction_hash = trunk_transaction_hash
+                txn.trunk_transaction_hash = previoustx # the previous transaction
+
+            # Let's do the pow locally
+            txn_string = txn.as_tryte_string().__str__()
+            # returns a python unicode string
+            powed_txn_string = get_powed_tx_trytes(txn_string, mwm)
+            # construct trytestring from python string
+            powed_txn_trytes = TryteString(powed_txn_string)
+
+            # Create powed txn object
+            # This method calculates the hash for the transaction
+            powed_txn = Transaction.from_tryte_string(
+                trytes=powed_txn_trytes
+            )
+            previoustx = powed_txn.hash
+            # put that back in the bundle
+            bundle.transactions[txn.current_index] = powed_txn
+
+            # Check for inconsistency in hash
+            hash_trits = powed_txn.hash.as_trits()
+            if hash_trits[-mwm:] == trailing_zeros:
+                # We are good to go, exit from while loop
+                break
             else:
-                raise ValueError('Tail transaction is inconsistent in bundle')
+                i = i + 1
+                print('Ooops, wrong hash detected in try'
+                    ' #{rounds}. Recalculating pow... '.format(rounds= i)
+                )
 
-        else: # It is not a tail transaction
-            txn.branch_transaction_hash = trunk_transaction_hash
-            txn.trunk_transaction_hash = previoustx # the previous transaction
-        
-        # Let's do the pow locally
-        txn_string = txn.as_tryte_string().__str__()
-        # returns a python unicode string
-        powed_txn_string = get_powed_tx_trytes(txn_string, mwm)
-        # construct trytestring from python string
-        powed_txn_trytes = TryteString(powed_txn_string)
-        # compute transaction hash
-        hash_string = get_hash_trytes(powed_txn_string)
-        hash_trytes = TryteString(hash_string)
+        # Something really bad happened
+        if i == max_iter:
+            raise with_context(
+                exc=ValueError('PoW calculation failed for {max_iter} times.'
+                    ' Make sure that the transaction is valid: {tx}'.format(
+                    max_iter=max_iter,
+                    tx=powed_txn.as_json_compatible()
+                    )
+                ),
+                context={
+                    'original': txn,
+                },
+            )
 
-        # Check transaction hash
-        hash_trits = hash_trytes.as_trits()
-        # Last `mwm` trits should be zero
-        if hash_trits[-mwm:] != trailing_zeros:
-            raise ValueError('Inconsistent transaction hash returned.')
-
-        hash_= TransactionHash(hash_trytes)
-
-        # Create powed txn object
-        powed_txn = Transaction.from_tryte_string(
-            trytes=powed_txn_trytes,
-            hash_=hash_
-        )
-
-        previoustx = powed_txn.hash
-        # put that back in the bundle
-        bundle.transactions[txn.current_index] = powed_txn
     return bundle.as_tryte_strings()
