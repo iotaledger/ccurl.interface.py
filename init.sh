@@ -13,6 +13,31 @@ rm -f pow/libccurl.so
 # Get current working directory
 WD=$(pwd)
 
+# By default, ccurl lib compiles with debug symbols, that we don't necessarly
+# want to see when using the interface. Remove them before building.
+
+# Definition of a DEBUG symbol
+pattern='#ifndef DEBUG'
+
+# Find files that define DEBUG symbols in ccurl repo
+result=$(grep -rnw 'ccurl_repo/' -e "$pattern" -l)
+
+# Result is not empty
+if [ -n "$result" ]; then
+    # Transform cmd output to array
+    readarray -t files <<<$result
+
+    # Go thorugh the files and delete line with pattern + 2 follwing lines
+    # A definition in c looks like this:
+    #   #ifndef DEBUG
+    #   define DEBUG
+    #   endif
+    for i in "${files[@]}"; do
+        echo "Removing DEBUG symbols from $i"
+        sed -i -e "/$pattern/,+2d" $i
+    done
+fi
+
 # Bulding using cmake
 echo "Building ccurl library with cmake..."
 cd ccurl_repo/ccurl && mkdir -p build && cd build && cmake .. && cmake --build .
