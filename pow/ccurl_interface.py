@@ -7,6 +7,8 @@ from iota import Bundle, TransactionTrytes, TransactionHash, TryteString, \
 import math
 import time
 from iota.exceptions import with_context
+import logging
+from sys import stderr
 
 from pkg_resources import resource_filename
 libccurl_path = resource_filename("pow","libccurl.so")
@@ -23,6 +25,10 @@ _libccurl.ccurl_pow.argtypes = [c_char_p, c_int]
 
 _libccurl.ccurl_digest_transaction.restype = POINTER(c_char)
 _libccurl.ccurl_digest_transaction.argtypes = [c_char_p]
+
+# Create a logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(stream=stderr, level=logging.INFO)
 
 def check_tx_trytes_length(trytes):
     """
@@ -167,9 +173,8 @@ def attach_to_tangle(bundle_trytes, # Iterable[TryteString]
                 break
             else:
                 i = i + 1
-                print('Ooops, wrong hash detected in try'
-                    ' #{rounds}. Recalculating pow... '.format(rounds= i)
-                )
+                logger.info('Ooops, wrong hash detected in try'
+                    ' #{rounds}. Recalculating pow... '.format(rounds= i))
 
         # Something really bad happened
         if i == max_iter:

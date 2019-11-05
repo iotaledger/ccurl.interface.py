@@ -15,8 +15,6 @@ if PY2:
 else:
     from unittest.mock import MagicMock, patch
 
-# Calculate time in milliseconds (for timestamp)
-get_current_ms = lambda : int(round(time.time() * 1000))
 
 class CcurlPowTestcase(TestCase):
     """
@@ -193,14 +191,17 @@ class CcurlPowTestcase(TestCase):
 
         # Result is reused accross tests, no need to calculate it
         # multiple times.
-        self.before = get_current_ms()
-        self.powed = ccurl_interface.attach_to_tangle(
-            self.bundle.as_tryte_strings(),
-            self.branch,
-            self.trunk,
-            mwm=14
-        )
-        self.after = get_current_ms()
+        # Mock away current time calculation, timestamps are imaginary from
+        # this point on.
+        self.before = 99
+        with patch('pow.ccurl_interface.get_current_ms', MagicMock(return_value=100)):
+            self.powed = ccurl_interface.attach_to_tangle(
+                self.bundle.as_tryte_strings(),
+                self.branch,
+                self.trunk,
+                mwm=14
+            )
+        self.after = 101
         self.powed_bundle = Bundle.from_tryte_strings(self.powed)
 
     def test_trailing_zeros(self):
